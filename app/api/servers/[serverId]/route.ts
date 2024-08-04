@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 
 import { currentProfile } from "@/lib/current-profile";
-import { redirectToSignIn } from "@clerk/nextjs";
 import { db } from "@/lib/db";
 
 export async function PATCH(req: Request, {params}: {params: {serverId: string}}) {
@@ -29,6 +28,30 @@ export async function PATCH(req: Request, {params}: {params: {serverId: string}}
 
     } catch (error) {
         console.error('Server Id Patch', error)
+        return new NextResponse('Internal server error', {status: 500});
+    }
+}
+
+export async function DELETE(req: Request, {params}: {params: {serverId: string}}) {
+    try {
+        
+        const profile = await currentProfile();
+
+        if(!profile) {
+            return new NextResponse('Unauthorized', {status: 401});
+        }
+
+        const server = await db.server.delete({
+            where: {
+                id: params.serverId,
+                profileId: profile.id
+            }
+        })
+
+        return NextResponse.json(server);
+
+    } catch (error) {
+        console.error('Server Id Delete', error)
         return new NextResponse('Internal server error', {status: 500});
     }
 }

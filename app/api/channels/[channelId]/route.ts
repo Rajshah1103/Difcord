@@ -8,8 +8,6 @@ export async function DELETE(req: Request, { params }: { params: { channelId: st
         const profile = await currentProfile();
         const { searchParams } = new URL(req.url);
 
-        console.log('params', params);
-
         const serverId = searchParams.get("serverId");
 
         if(!profile) {
@@ -23,7 +21,7 @@ export async function DELETE(req: Request, { params }: { params: { channelId: st
             return new NextResponse("Channel Id missing", { status: 400 })
         }
 
-        const server = db.server.update({
+        const server = await db.server.update({
             where: {
                 id: serverId,
                 members: {
@@ -60,8 +58,6 @@ export async function PATCH(req: Request, { params }: { params: { channelId: str
         const profile = await currentProfile();
         const { name, type } = await req.json();
         const { searchParams } = new URL(req.url);
-
-        console.log('params', params);
 
         const serverId = searchParams.get("serverId");
 
